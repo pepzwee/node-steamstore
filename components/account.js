@@ -326,14 +326,10 @@ SteamStore.prototype.setDisplayLanguages = function(primaryLanguage, secondaryLa
  */
 SteamStore.prototype.createWallet = function(code, billingAddress, callback) {
 	return StdLib.Promises.callbackPromise([
-		'eresult',
-		'detail',
-		'redeemable',
-		'amount',
-		'currencyCode'
+		'eresult'
 	], callback, (accept, reject) => {
 		this.request.post({
-			"uri": "https://store.steampowered.com/account/createwalletandcheckfunds/",
+			"uri": "https://store.steampowered.com/account/ajaxcreatewalletandcheckfunds/",
 			"form": {
 				"wallet_code": code,
 				"CreateFromAddress": "1",
@@ -350,16 +346,12 @@ SteamStore.prototype.createWallet = function(code, billingAddress, callback) {
 				return;
 			}
 
-			if (!body.success && !body.detail && !body.wallet) {
+			if (!body.success) {
 				return reject(new Error("Malformed response"));
 			}
 
 			accept({
-				"eresult": body.success,
-				"detail": body.detail,
-				"redeemable": body.success == EResult.OK && body.detail == EPurchaseResult.NoDetail,
-				"amount": body.wallet && body.wallet.amount,
-				"currencyCode": body.wallet && body.wallet.currencycode
+				"eresult": body.success
 			});
 		});
 	});
